@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Need libperl
-apt-get install -y libperl
+apt-get install -y libperl-dev
 
 # Clean up
 rm -rf /app/sw
@@ -25,13 +25,13 @@ wget --progress=dot:mega http://perl.apache.org/dist/mod_perl-2.0.5.tar.gz
 echo '---> Building mod_perl'
 tar -zxvf mod_perl-2.0.5.tar.gz
 cd mod_perl-2.0.5
-perl Makefile.PL MP_AP_PREFIX=/app/httpd  #MP_APXS=/app/sw/apache/bin/apxs MP_AP_PREFIX=/app/sw/apache2/
+perl Makefile.PL MP_AP_PREFIX=/app/httpd PREFIX=/app/perl #MP_APXS=/app/sw/apache/bin/apxs MP_AP_PREFIX=/app/sw/apache2/
 make
 make test
 make install
 
 echo '---> Bundling httpd/mod_perl'
 cd /app
-tar -zcvf /vagrant/http_2.2.21-mod_perl_2.0.5.tar.gz httpd
+tar -zcvf /vagrant/httpd_2.2.21-mod_perl_2.0.5.tar.gz httpd perl
 
 echo '---> DONE'
