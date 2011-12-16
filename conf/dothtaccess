@@ -1,0 +1,9 @@
+# Serve .pl scripts
+SetHandler perl-script
+PerlResponseHandler ModPerl::Registry
+PerlOptions +ParseHeaders
+Options +ExecCGI
+Order allow,deny
+Allow from all 
+# Directory Index Fixup
+PerlFixupHandler Heroku::IndexFixup
