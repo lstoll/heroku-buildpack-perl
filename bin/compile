@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+# fail fast
+set -e
+
+APACHE_BUNDLE="http://s3.lstoll.net/buildpacks/http_2.2.21-mod_perl_2.0.5.tar.gz"
+
+APACHE_PATH="httpd"
+
+BIN_DIR=$(dirname $0)
+BUILD_DIR=$1
+CACHE_DIR=$2
+LP_DIR=`cd $(dirname $0); cd ..; pwd`
+
+# include .files when moving things around
+shopt -s dotglob
+
+cd $BUILD_DIR
+
+# move app things to www
+mkdir -p $CACHE_DIR/www
+mv * $CACHE_DIR/www
+mv $CACHE_DIR/www .
+
+# keep Procfile
+if [ -f www/Procfile ]; then
+  mv www/Procfile .
+fi
+
+# install apache if needed
+# if [ ! -d $APACHE_PATH ]; then
+  echo "-----> Bundling Apache"
+  curl --silent --max-time 60 --location $APACHE_bundle | tar xz
+#
+
+# update config files
+cp $LP_DIR/conf/httpd.conf $APACHE_PATH/conf
+
+cat >>boot.sh <<EOF
+sed -i 's/Listen 80/Listen '\$PORT'/' /app/${APACHE_PATH}/conf/httpd.conf
+for var in \`env|cut -f1 -d=\`; do
+  echo "PassEnv \$var" >> /app/apache/conf/httpd.conf;
+done
+touch /app/apache/logs/error_log
+touch /app/apache/logs/access_log
+tail -F /app/apache/logs/error_log &
+tail -F /app/apache/logs/access_log &
+echo "Launching apache"
+exec /app/apache/bin/httpd -DNO_DETACH
+EOF

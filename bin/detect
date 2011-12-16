@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# Could be better...
+if [ -f $1/index.pl ]; then
+  echo "Perl" && exit 0
+else
+  echo "no" && exit 1
+fi
