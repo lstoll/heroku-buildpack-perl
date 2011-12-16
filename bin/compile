@@ -43,6 +43,10 @@ fi
 # update config files
 cp $LP_DIR/conf/httpd.conf $APACHE_PATH/conf
 
+# Add our DirectoryIndex fixup
+mkdir -p $BUILD_DIR/lib/Heroku/
+cp $LP_DIR/conf/IndexFixup.pm $BUILD_DIR/lib/Heroku/
+
 cat >>boot.sh <<EOF
 sed -i 's/Listen 80/Listen '\$PORT'/' /app/${APACHE_PATH}/conf/httpd.conf
 for var in \`env|cut -f1 -d=\`; do
